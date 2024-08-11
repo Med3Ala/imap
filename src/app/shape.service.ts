@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as L from 'leaflet';
-import { BehaviorSubject, Observable, from, fromEventPattern, take } from 'rxjs';
+import { BehaviorSubject, Observable, from, fromEventPattern, skip, take, takeUntil, takeWhile } from 'rxjs';
 // import turf
 import * as turf from '@turf/turf';
 
@@ -46,6 +46,44 @@ export class iShape {
     this.pins.push(L.marker(e,{ icon: pinicon }));
     this.pins[this.pins.length - 1].addTo(ShapeService.map.value!);
     console.log(this.coordinates);
+  }
+}
+
+export class iPoly extends iShape {
+  constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
+    super(id, name, area, perimeter, coordinates);
+  }
+
+  draw(){
+    console.log('Drawing Poly');
+    let finished = false;
+
+    from(ShapeService.clickObs).pipe(take(1)).subscribe(e=>{
+      this.addPin(e.latlng);
+      this.pins[0].on('click', ()=>{
+        finished = true;
+        this.shape = L.polygon(this.coordinates, {
+          color: 'blue',
+          fillColor: '#30f',
+          fillOpacity: 0.5
+        });
+        ShapeService.Shapes.next([...ShapeService.Shapes.value, this]);
+        this.refreshData();
+      })
+    })
+
+    from(ShapeService.clickObs).pipe(
+      skip(1),
+      takeWhile(() => !finished)
+    ).subscribe(e=>{
+      this.addPin(e.latlng);
+    });
+  }
+
+  refreshData(){
+    // reclaculate area and perimeter
+    this.area = turf.area(turf.polygon([this.coordinates.map((c) => [c.lng, c.lat])]));
+    this.perimeter = turf.length(turf.lineString(this.coordinates.map((c) => [c.lng, c.lat])), {units: 'kilometers'}) * 1000;
   }
 }
 

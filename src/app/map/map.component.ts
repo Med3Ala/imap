@@ -1,7 +1,7 @@
 import { AfterViewInit, Component } from '@angular/core';
 
 import * as L from 'leaflet';
-import { ShapeService, iCircle, iShape, iRect } from '../shape.service';
+import { ShapeService, iCircle, iShape, iRect, iPoly } from '../shape.service';
 
 @Component({
   selector: 'app-map',
@@ -32,8 +32,8 @@ export class MapComponent implements AfterViewInit {
       })
     })
     //new iCircle(1, 'Circle', 0, 0, [], 0).draw();
-    new iRect(1, 'Rect', 100, 40, []).draw();
-
+    //new iRect(1, 'Rect', 100, 40, []).draw();
+    new iPoly(1, 'Poly', 0, 0, []).draw();
   }
 
   private initMap(): void {
