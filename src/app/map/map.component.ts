@@ -1,6 +1,7 @@
 import { AfterViewInit, Component } from '@angular/core';
 
 import * as L from 'leaflet';
+import { ShapeService, iCircle, iShape } from '../shape.service';
 
 @Component({
   selector: 'app-map',
@@ -8,7 +9,7 @@ import * as L from 'leaflet';
   styleUrls: ['./map.component.scss']
 })
 export class MapComponent implements AfterViewInit {
-  private map : L.Map | undefined;
+  private map!: L.Map;
   
   tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
@@ -16,9 +17,20 @@ export class MapComponent implements AfterViewInit {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   });
 
+  constructor(private shapeService: ShapeService) { 
+
+  }
+
 
   ngAfterViewInit(): void {
     this.initMap();
+    ShapeService.map.next(this.map);
+    ShapeService.Shapes.subscribe((shapes) => {
+      shapes.forEach((s:iShape)=>{
+        s.shape.addTo(this.map);
+      })
+    })
+    new iCircle(1, 'Circle', 0, 0, [], 0).draw();
   }
 
   private initMap(): void {
