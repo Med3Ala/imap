@@ -49,16 +49,18 @@ export class iShape {
   }
 }
 
-export class iSquare extends iShape {
-  side: number;
+export class iRect extends iShape {
+  length: number;
+  width: number;
 
-  constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[], side: number) {
+  constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
     super(id, name, area, perimeter, coordinates);
-    this.side = side;
+    this.length = 0;
+    this.width = 0;
   }
 
   draw(){
-    console.log('Drawing square');
+    console.log('Drawing Rect');
     from(ShapeService.clickObs).pipe(
       take(2)
     ).subscribe({
@@ -66,7 +68,8 @@ export class iSquare extends iShape {
         this.addPin(e.latlng);
       },
       complete: () => {
-        this.side = (turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.coordinates[1].lng, this.coordinates[1].lat]), {units: 'kilometers'}) * 1000)/Math.sqrt(2);
+        this.width = turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.coordinates[1].lng, this.coordinates[0].lat]), {units: 'kilometers'}) * 1000;
+        this.length = turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.coordinates[0].lng, this.coordinates[1].lat]), {units: 'kilometers'}) * 1000;
         this.shape = L.polygon([
           [this.coordinates[0].lat, this.coordinates[0].lng],
           [this.coordinates[1].lat, this.coordinates[0].lng],
@@ -85,8 +88,8 @@ export class iSquare extends iShape {
 
   refreshData(){
     // reclaculate area and perimeter
-    this.area = Math.pow(this.side, 2);
-    this.perimeter = 4 * this.side;
+    this.area = this.length * this.width;
+    this.perimeter = 2 * (this.length + this.width);
   }
 }
 
