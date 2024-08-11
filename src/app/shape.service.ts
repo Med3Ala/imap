@@ -33,6 +33,7 @@ export class iShape {
   shape! : L.Layer;
   pins: L.Marker[] = [];
   isVisiblePin: boolean = true;
+  isEditable: boolean = false;
 
   constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
     this.id = id;
@@ -44,6 +45,20 @@ export class iShape {
 
   draw(){
     console.log('Drawing Shape');
+  }
+
+  toggleEdit(edit? : boolean){
+    if(edit != undefined)
+      this.isEditable = edit;
+    else
+      this.isEditable = !this.isEditable;
+
+    this.pins.forEach((p) => {
+      if(this.isEditable)
+        p.dragging?.enable();
+      else
+        p.dragging?.disable();
+    })
   }
 
   addPin(e: L.LatLng){
@@ -91,6 +106,7 @@ export class iPath extends iShape {
         });
         ShapeService.Shapes.next([...ShapeService.Shapes.value, this]);
         this.refreshData();
+        this.enableDragging();
       })
     })
 
@@ -104,6 +120,17 @@ export class iPath extends iShape {
 
   refreshData(){
     this.perimeter = turf.length(turf.lineString(this.coordinates.map((c) => [c.lng, c.lat])), {units: 'kilometers'}) * 1000;
+  }
+
+  enableDragging(){
+    this.pins.forEach((p,index) => {
+      p.on('drag', (e) => {
+        console.log(e)
+        this.coordinates[index] = p.getLatLng();
+        (this.shape as L.Polyline)?.setLatLngs(this.coordinates);
+        this.refreshData();
+      })
+    })
   }
 }
 
@@ -127,6 +154,7 @@ export class iPoly extends iShape {
           fillOpacity: 0.5
         });
         ShapeService.Shapes.next([...ShapeService.Shapes.value, this]);
+        this.enableDragging();
         this.refreshData();
       })
     })
@@ -143,6 +171,20 @@ export class iPoly extends iShape {
     // reclaculate area and perimeter
     this.area = turf.area(turf.polygon([this.coordinates.map((c) => [c.lng, c.lat])]));
     this.perimeter = turf.length(turf.lineString(this.coordinates.map((c) => [c.lng, c.lat])), {units: 'kilometers'}) * 1000;
+  }
+
+  
+  enableDragging(){
+    console.log("Enabling Dragging")
+    this.pins.forEach((p,index) => {
+      console.log("Enabling Dragging")
+      p.on('drag', (e) => {
+        console.log(e)
+        this.coordinates[index] = p.getLatLng();
+        (this.shape as L.Polygon)?.setLatLngs(this.coordinates);
+        this.refreshData();
+      })
+    })
   }
 }
 
@@ -179,6 +221,7 @@ export class iRect extends iShape {
         });
         ShapeService.Shapes.next([...ShapeService.Shapes.value, this]);
         this.refreshData();
+        this.enableDraggingg();
       }
     });
   }
@@ -187,6 +230,21 @@ export class iRect extends iShape {
     // reclaculate area and perimeter
     this.area = this.length * this.width;
     this.perimeter = 2 * (this.length + this.width);
+  }
+
+  enableDraggingg(){
+    var dragDot = (e: any, index : number) => {
+      this.coordinates[index] = this.pins[index].getLatLng();
+      (this.shape as L.Polygon)?.setLatLngs([
+        [this.coordinates[0].lat, this.coordinates[0].lng],
+        [this.coordinates[1].lat, this.coordinates[0].lng],
+        [this.coordinates[1].lat, this.coordinates[1].lng],
+        [this.coordinates[0].lat, this.coordinates[1].lng],
+      ]);
+      this.refreshData();
+    }
+    this.pins[0].on('drag', (e) => {dragDot(e, 0)});
+    this.pins[1].on('drag', (e) => {dragDot(e, 1)});
   }
 }
 
@@ -217,6 +275,7 @@ export class iCircle extends iShape {
         })
         ShapeService.Shapes.next([...ShapeService.Shapes.value, this]);
         this.refreshData();
+        this.enableDraggingg();
       }
     });
 
@@ -229,6 +288,17 @@ export class iCircle extends iShape {
     // reclaculate area and perimeter
     this.area = Math.PI * Math.pow(this.radius, 2);
     this.perimeter = 2 * Math.PI * this.radius;
+  }
+
+  enableDraggingg(){
+    this.pins[0].on('drag', (e) => {
+      (this.shape as L.CircleMarker ).setLatLng(this.pins[0].getLatLng());
+    });
+    this.pins[1].on('drag', (e) => {
+      this.radius = turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.pins[1].getLatLng().lng, this.pins[1].getLatLng().lat]), {units: 'kilometers'}) * 1000;
+      (this.shape as L.CircleMarker ).setRadius(this.radius);
+      this.refreshData();
+    });
   }
 }
 

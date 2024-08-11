@@ -44,5 +44,11 @@ export class AppComponent implements OnInit{
         s.togglePin();
       });
     }
+    if(this.cmdString.includes('edit')){
+      this.cmdString = "";
+      ShapeService.Shapes.value.forEach((s) => {
+        s.toggleEdit();
+      })
+    }
   }
 }
