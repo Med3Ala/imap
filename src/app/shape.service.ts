@@ -49,6 +49,43 @@ export class iShape {
   }
 }
 
+export class iPath extends iShape {
+  constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
+    super(id, name, area, perimeter, coordinates);
+  }
+
+  draw(){
+    console.log('Drawing Path');
+    let finished = false;
+
+    from(ShapeService.clickObs).pipe(take(1)).subscribe(e=>{
+      this.addPin(e.latlng);
+      this.pins[0].bindPopup("click me to finish drawing", {closeOnClick:false}).openPopup()
+      this.pins[0].on('click', ()=>{
+        finished = true;
+        this.shape = L.polyline(this.coordinates, {
+          color: 'blue',
+          fillColor: '#30f',
+          fillOpacity: 0.5
+        });
+        ShapeService.Shapes.next([...ShapeService.Shapes.value, this]);
+        this.refreshData();
+      })
+    })
+
+    from(ShapeService.clickObs).pipe(
+      skip(1),
+      takeWhile(() => !finished)
+    ).subscribe(e=>{
+      this.addPin(e.latlng);
+    });
+  }
+
+  refreshData(){
+    this.perimeter = turf.length(turf.lineString(this.coordinates.map((c) => [c.lng, c.lat])), {units: 'kilometers'}) * 1000;
+  }
+}
+
 export class iPoly extends iShape {
   constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
     super(id, name, area, perimeter, coordinates);
@@ -60,6 +97,7 @@ export class iPoly extends iShape {
 
     from(ShapeService.clickObs).pipe(take(1)).subscribe(e=>{
       this.addPin(e.latlng);
+      this.pins[0].bindPopup("click me to finish drawing", {closeOnClick:false}).openPopup()
       this.pins[0].on('click', ()=>{
         finished = true;
         this.shape = L.polygon(this.coordinates, {
