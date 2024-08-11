@@ -32,6 +32,7 @@ export class iShape {
   coordinates: L.LatLng[];
   shape! : L.Layer;
   pins: L.Marker[] = [];
+  isVisiblePin: boolean = true;
 
   constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
     this.id = id;
@@ -41,11 +42,31 @@ export class iShape {
     this.coordinates = coordinates;
   }
 
+  draw(){
+    console.log('Drawing Shape');
+  }
+
   addPin(e: L.LatLng){
     this.coordinates.push(e);
     this.pins.push(L.marker(e,{ icon: pinicon }));
     this.pins[this.pins.length - 1].addTo(ShapeService.map.value!);
     console.log(this.coordinates);
+  }
+
+  togglePin(show? : boolean){
+
+    if(show != undefined)
+      this.isVisiblePin = show;
+    else
+      this.isVisiblePin = !this.isVisiblePin;
+
+    this.pins.forEach((p) => {
+      if(this.isVisiblePin){
+        p.addTo(ShapeService.map.value!);
+      }else{
+        p.remove();
+      }
+    });
   }
 }
 
@@ -54,7 +75,7 @@ export class iPath extends iShape {
     super(id, name, area, perimeter, coordinates);
   }
 
-  draw(){
+  override draw(){
     console.log('Drawing Path');
     let finished = false;
 
@@ -91,7 +112,7 @@ export class iPoly extends iShape {
     super(id, name, area, perimeter, coordinates);
   }
 
-  draw(){
+  override draw(){
     console.log('Drawing Poly');
     let finished = false;
 
@@ -135,7 +156,7 @@ export class iRect extends iShape {
     this.width = 0;
   }
 
-  draw(){
+  override draw(){
     console.log('Drawing Rect');
     from(ShapeService.clickObs).pipe(
       take(2)
@@ -177,7 +198,7 @@ export class iCircle extends iShape {
     this.radius = radius;
   }
 
-  draw(){
+  override draw(){
     console.log('Drawing circle');
     
     from(ShapeService.clickObs).pipe(

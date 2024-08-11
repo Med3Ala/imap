@@ -34,7 +34,13 @@ export class MapComponent implements AfterViewInit {
     //new iCircle(1, 'Circle', 0, 0, [], 0).draw();
     //new iRect(1, 'Rect', 100, 40, []).draw();
     //new iPoly(1, 'Poly', 0, 0, []).draw();
-    new iPath(1, 'Path', 0, 0, []).draw();
+    let p : iShape = new iPath(1, 'Path', 0, 0, []);
+    p.draw();
+    document.addEventListener('keydown', (e)=>{
+      if(e.key == 's'){
+        p.togglePin();
+      }
+    })
   }
 
   private initMap(): void {
