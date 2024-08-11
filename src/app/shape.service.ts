@@ -32,6 +32,7 @@ export class iShape {
   coordinates: L.LatLng[];
   shape! : L.Layer;
   pins: L.Marker[] = [];
+  isVisible: boolean = true;
   isVisiblePin: boolean = true;
   isEditable: boolean = false;
 
@@ -65,7 +66,6 @@ export class iShape {
     this.coordinates.push(e);
     this.pins.push(L.marker(e,{ icon: pinicon }));
     this.pins[this.pins.length - 1].addTo(ShapeService.map.value!);
-    console.log(this.coordinates);
   }
 
   togglePin(show? : boolean){
@@ -82,6 +82,33 @@ export class iShape {
         p.remove();
       }
     });
+  }
+
+  toggleVisibility(visible? : boolean){
+    if(visible != undefined)
+      this.isVisible = visible;
+    else
+      this.isVisible = !this.isVisible;
+
+    if(this.isVisible){
+      this.shape.addTo(ShapeService.map.value!);
+      this.pins.forEach((p) => {
+        p.addTo(ShapeService.map.value!);
+      });
+    }else{
+      this.shape.remove();
+      this.pins.forEach((p) => {
+        p.remove();
+      });
+    }
+  }
+
+  delete(){
+    this.shape.remove();
+    this.pins.forEach((p) => {
+      p.remove();
+    });
+    ShapeService.Shapes.next(ShapeService.Shapes.value.filter((s) => s.id != this.id));
   }
 }
 
@@ -104,6 +131,7 @@ export class iPath extends iShape {
           fillColor: '#30f',
           fillOpacity: 0.5
         });
+        this.shape.on("dblclick", ()=>{this.delete()})
         ShapeService.Shapes.next([...ShapeService.Shapes.value, this]);
         this.refreshData();
         this.enableDragging();
@@ -125,7 +153,6 @@ export class iPath extends iShape {
   enableDragging(){
     this.pins.forEach((p,index) => {
       p.on('drag', (e) => {
-        console.log(e)
         this.coordinates[index] = p.getLatLng();
         (this.shape as L.Polyline)?.setLatLngs(this.coordinates);
         this.refreshData();
@@ -153,6 +180,7 @@ export class iPoly extends iShape {
           fillColor: '#30f',
           fillOpacity: 0.5
         });
+        this.shape.on("dblclick", ()=>{this.delete()})
         ShapeService.Shapes.next([...ShapeService.Shapes.value, this]);
         this.enableDragging();
         this.refreshData();
@@ -175,11 +203,8 @@ export class iPoly extends iShape {
 
   
   enableDragging(){
-    console.log("Enabling Dragging")
     this.pins.forEach((p,index) => {
-      console.log("Enabling Dragging")
       p.on('drag', (e) => {
-        console.log(e)
         this.coordinates[index] = p.getLatLng();
         (this.shape as L.Polygon)?.setLatLngs(this.coordinates);
         this.refreshData();
@@ -219,6 +244,7 @@ export class iRect extends iShape {
           fillColor: '#30f',
           fillOpacity: 0.5
         });
+        this.shape.on("dblclick", ()=>{this.delete()})
         ShapeService.Shapes.next([...ShapeService.Shapes.value, this]);
         this.refreshData();
         this.enableDraggingg();
@@ -273,15 +299,12 @@ export class iCircle extends iShape {
           fillOpacity: 0.5,
           radius : this.radius
         })
+        this.shape.on("dblclick", ()=>{this.delete()})
         ShapeService.Shapes.next([...ShapeService.Shapes.value, this]);
         this.refreshData();
         this.enableDraggingg();
       }
     });
-
-    // ShapeService.map.value?.on('click', (e: L.LeafletMouseEvent) => {
-    //   console.log(e);
-    // });
   }
 
   refreshData(){

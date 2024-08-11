@@ -28,7 +28,6 @@ export class MapComponent implements AfterViewInit {
     ShapeService.Shapes.subscribe((shapes) => {
       shapes.forEach((s:iShape)=>{
         s.shape.addTo(this.map);
-        console.log(s)
       })
     })
     //new iCircle(1, 'Circle', 0, 0, [], 0).draw();
