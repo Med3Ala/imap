@@ -49,6 +49,47 @@ export class iShape {
   }
 }
 
+export class iSquare extends iShape {
+  side: number;
+
+  constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[], side: number) {
+    super(id, name, area, perimeter, coordinates);
+    this.side = side;
+  }
+
+  draw(){
+    console.log('Drawing square');
+    from(ShapeService.clickObs).pipe(
+      take(2)
+    ).subscribe({
+      next: (e: L.LeafletMouseEvent) => {
+        this.addPin(e.latlng);
+      },
+      complete: () => {
+        this.side = (turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.coordinates[1].lng, this.coordinates[1].lat]), {units: 'kilometers'}) * 1000)/Math.sqrt(2);
+        this.shape = L.polygon([
+          [this.coordinates[0].lat, this.coordinates[0].lng],
+          [this.coordinates[1].lat, this.coordinates[0].lng],
+          [this.coordinates[1].lat, this.coordinates[1].lng],
+          [this.coordinates[0].lat, this.coordinates[1].lng],
+        ], {
+          color: 'blue',
+          fillColor: '#30f',
+          fillOpacity: 0.5
+        });
+        ShapeService.Shapes.next([...ShapeService.Shapes.value, this]);
+        this.refreshData();
+      }
+    });
+  }
+
+  refreshData(){
+    // reclaculate area and perimeter
+    this.area = Math.pow(this.side, 2);
+    this.perimeter = 4 * this.side;
+  }
+}
+
 export class iCircle extends iShape {
   radius: number;
 
@@ -67,19 +108,27 @@ export class iCircle extends iShape {
         this.addPin(e.latlng);
       },
       complete: () => {
+        this.radius = turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.coordinates[1].lng, this.coordinates[1].lat]), {units: 'kilometers'}) * 1000;
         this.shape = L.circle(this.coordinates[0], {
           color: 'blue',
           fillColor: '#30f',
           fillOpacity: 0.5,
-          radius : turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.coordinates[1].lng, this.coordinates[1].lat]), {units: 'kilometers'}) * 1000
+          radius : this.radius
         })
         ShapeService.Shapes.next([...ShapeService.Shapes.value, this]);
+        this.refreshData();
       }
     });
 
     // ShapeService.map.value?.on('click', (e: L.LeafletMouseEvent) => {
     //   console.log(e);
     // });
+  }
+
+  refreshData(){
+    // reclaculate area and perimeter
+    this.area = Math.PI * Math.pow(this.radius, 2);
+    this.perimeter = 2 * Math.PI * this.radius;
   }
 }
 
