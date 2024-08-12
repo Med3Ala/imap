@@ -178,6 +178,7 @@ export class iShape {
   
     refreshData(){
       this.perimeter = turf.length(turf.lineString(this.coordinates.map((c) => [c.lng, c.lat])), {units: 'kilometers'}) * 1000;
+      this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
     }
   
     enableDragging(){
@@ -233,9 +234,9 @@ export class iShape {
         ), [this.coordinates[0].lng, this.coordinates[0].lat] as any]
       ]));
       this.perimeter = turf.length(turf.lineString(this.coordinates.map((c) => [c.lng, c.lat])), {units: 'kilometers'}) * 1000;
-  }
-  
-    
+      this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
+    }
+ 
     enableDragging(){
       this.pins.forEach((p,index) => {
         p.on('drag', (e) => {
@@ -281,7 +282,7 @@ export class iShape {
           this.shape.on("dblclick", ()=>{this.delete()})
           iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
           this.refreshData();
-          this.enableDraggingg();
+          this.enableDragging();
         }
       });
     }
@@ -290,9 +291,10 @@ export class iShape {
       // reclaculate area and perimeter
       this.area = this.length * this.width;
       this.perimeter = 2 * (this.length + this.width);
+      this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
     }
   
-    enableDraggingg(){
+    enableDragging(){
       var dragDot = (e: any, index : number) => {
         this.coordinates[index] = this.pins[index].getLatLng();
         (this.shape as L.Polygon)?.setLatLngs([
@@ -336,7 +338,7 @@ export class iShape {
           this.shape.on("dblclick", ()=>{this.delete()})
           iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
           this.refreshData();
-          this.enableDraggingg();
+          this.enableDragging();
         }
       });
     }
@@ -345,9 +347,10 @@ export class iShape {
       // reclaculate area and perimeter
       this.area = Math.PI * Math.pow(this.radius, 2);
       this.perimeter = 2 * Math.PI * this.radius;
+      this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
     }
   
-    enableDraggingg(){
+    enableDragging(){
       this.pins[0].on('drag', (e) => {
         (this.shape as L.CircleMarker ).setLatLng(this.pins[0].getLatLng());
       });
@@ -383,22 +386,22 @@ function iShapeCli(context : iShapeContext){
     if(cmdString.includes('polygon')){
       console.log("%cexcuting command : polygon", "color: green")
       cmdString = "";
-      new iPoly(1, 'Poly', 0, 0, []).draw();
+      new iPoly(iShapeContext.Shapes.value.length, 'Poly', 0, 0, []).draw();
     }
     if(cmdString.includes('circle')){
       console.log("%cexcuting command : circle", "color: green")
       cmdString = "";
-      new iCircle(1, 'Circle', 0, 0, [], 0).draw();
+      new iCircle(iShapeContext.Shapes.value.length, 'Circle', 0, 0, [], 0).draw();
     }
     if(cmdString.includes('rectangle')){
       console.log("%cexcuting command : rectangle", "color: green")
       cmdString = "";
-      new iRect(1, 'Rect', 100, 40, []).draw();
+      new iRect(iShapeContext.Shapes.value.length, 'Rect', 100, 40, []).draw();
     }
     if(cmdString.includes('path')){
       console.log("%cexcuting command : path", "color: green")
       cmdString = "";
-      new iPath(1, 'Path', 0, 0, []).draw();
+      new iPath(iShapeContext.Shapes.value.length, 'Path', 0, 0, []).draw();
     }
     if(cmdString.includes('pins')){
       console.log("%cexcuting command : pins", "color: green")
