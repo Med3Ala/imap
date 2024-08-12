@@ -17,6 +17,11 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "sourceMap": {
+              "scripts": true,
+              "styles": true,
+              "vendor": true
+            },
             "outputPath": "dist/imap",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -97,6 +102,39 @@
               "src/styles.scss"
             ],
             "scripts": []
+          }
+        }
+      }
+    },
+    "leaflet-iShape": {
+      "projectType": "library",
+      "root": "projects/leaflet-i-shape",
+      "sourceRoot": "projects/leaflet-i-shape/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/leaflet-i-shape/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/leaflet-i-shape/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/leaflet-i-shape/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/leaflet-i-shape/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
           }
         }
       }

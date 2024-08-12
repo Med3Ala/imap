@@ -1,7 +1,8 @@
 import { AfterViewInit, Component } from '@angular/core';
 
 import * as L from 'leaflet';
-import { ShapeService, iCircle, iShape, iRect, iPoly, iPath } from '../shape.service';
+import { iShapeContext } from 'projects/leaflet-i-shape/src/lib/iShapeContext';
+// import { ShapeService, iCircle, iShape, iRect, iPoly, iPath } from '../shape.service';
 
 @Component({
   selector: 'app-map',
@@ -17,19 +18,24 @@ export class MapComponent implements AfterViewInit {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   });
 
-  constructor(private shapeService: ShapeService) { 
+  constructor(
+    //private shapeService: ShapeService
+  ) { 
 
   }
 
 
   ngAfterViewInit(): void {
     this.initMap();
-    ShapeService.map.next(this.map);
-    ShapeService.Shapes.subscribe((shapes) => {
-      shapes.forEach((s:iShape)=>{
-        s.shape.addTo(this.map);
-      })
-    })
+    iShapeContext.getInstance(this.map);
+    // ShapeService.map.next(this.map);
+    // ShapeService.Shapes.subscribe((shapes) => {
+    //   shapes.forEach((s:iShape)=>{
+    //     s.shape.addTo(this.map);
+    //   })
+    // })
+
+
     //new iCircle(1, 'Circle', 0, 0, [], 0).draw();
     //new iRect(1, 'Rect', 100, 40, []).draw();
     //new iPoly(1, 'Poly', 0, 0, []).draw();
