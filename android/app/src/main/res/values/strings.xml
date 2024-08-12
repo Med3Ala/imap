@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">imap</string>
+    <string name="title_activity_main">imap</string>
+    <string name="package_name">test.imap.app</string>
+    <string name="custom_url_scheme">test.imap.app</string>
+</resources>
