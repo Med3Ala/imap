@@ -2,12 +2,18 @@ div.container {
     margin: 20px;
     min-height: 500px;
     min-width: 300px;
-  }
+}
 
 table {
     width: 100%;
-  }
+
+    th {
+        text-align: center;
+    }
+    
+    .cdk-cell {
+        padding: 10px;
+        text-align: center;
+    }
+}
   
-  th {
-    text-align: left;
-  }

@@ -227,9 +227,13 @@ export class iShape {
   
     refreshData(){
       // reclaculate area and perimeter
-      this.area = turf.area(turf.polygon([this.coordinates.map((c) => [c.lng, c.lat])]));
+      this.area = turf.area(turf.polygon([
+        [...this.coordinates.map(
+          (c) => [c.lng, c.lat]
+        ), [this.coordinates[0].lng, this.coordinates[0].lat] as any]
+      ]));
       this.perimeter = turf.length(turf.lineString(this.coordinates.map((c) => [c.lng, c.lat])), {units: 'kilometers'}) * 1000;
-    }
+  }
   
     
     enableDragging(){

@@ -13,6 +13,7 @@ export class ShapesTableComponent implements OnInit {
   displayedColumns: string[] = [
     'id',
     'name',
+    'position',
     'area',
     'perimeter',
     'coordinates',
