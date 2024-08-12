@@ -42,5 +42,8 @@ export class AppComponent implements OnInit{
   drawPath() {
     iShapeContext.instance?.draw("path");
   }
+  drawMarker() {
+    iShapeContext.instance?.draw("marker");
+  }
 
 }

@@ -65,6 +65,9 @@ export class iShapeContext {
             case 'path':
                 shape = new iPath(iShapeContext.Shapes.value.length, 'Path', 0, 0, []);
                 break;
+            case 'marker':
+                shape = new iMarker(iShapeContext.Shapes.value.length, 'Marker', 0, 0, []);
+                break;
             default:
                 shape = new iPoly(iShapeContext.Shapes.value.length, 'Poly', 0, 0, []);
         }
@@ -380,6 +383,42 @@ export class iCircle extends iShape {
       this.refreshData();
     });
   }
+}
+
+export class iMarker extends iShape {
+    constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
+      super(id, name, area, perimeter, coordinates);
+    }
+  
+    override draw(){
+      console.log('Drawing Marker');
+      from(iShapeContext.clickObs).pipe(
+        take(1)
+      ).subscribe({
+        next: (e: L.LeafletMouseEvent) => {
+          this.addPin(e.latlng);
+          this.shape = this.pins[0];
+          this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
+          this.pins[0].dragging?.enable();
+          iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
+        }
+      });
+    }
+  
+    refreshData(){
+      // reclaculate area and perimeter
+      this.area = 0;
+      this.perimeter = 0;
+      this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
+    }
+  
+    enableDragging(){
+      this.pins[0].on('drag', (e) => {
+        this.coordinates[0] = this.pins[0].getLatLng();
+        (this.shape as L.Marker).setLatLng(this.coordinates[0]);
+        this.refreshData();
+      });
+    }
 }
   
 
