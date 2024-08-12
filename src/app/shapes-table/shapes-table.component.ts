@@ -10,7 +10,16 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 })
 export class ShapesTableComponent implements OnInit {
   shapes = new ShapesDataSource();
-  displayedColumns: string[] = ['name'];
+  displayedColumns: string[] = [
+    'id',
+    'name',
+    'area',
+    'perimeter',
+    'coordinates',
+    'pins',
+    'visible',
+    'editable',
+  ];
 
   constructor() {
 

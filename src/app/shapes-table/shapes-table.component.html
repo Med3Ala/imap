@@ -1,11 +1,52 @@
 <div class="container">
     hello world
 <table cdk-table [dataSource]="shapes">
+    <!-- Shape Id column -->
+    <ng-container cdkColumnDef="id">
+      <th cdk-header-cell *cdkHeaderCellDef> ID </th>
+      <td cdk-cell *cdkCellDef="let element"> {{element.id}} </td>
+    </ng-container>
     <!-- Shape Name column -->
     <ng-container cdkColumnDef="name">
       <th cdk-header-cell *cdkHeaderCellDef> Name </th>
       <td cdk-cell *cdkCellDef="let element"> {{element.name}} </td>
     </ng-container>
+    <!-- Shape Position column -->
+    <ng-container cdkColumnDef="position">
+      <th cdk-header-cell *cdkHeaderCellDef> Position </th>
+      <td cdk-cell *cdkCellDef="let element"> {{element.coordinates[0]}} </td>
+    </ng-container>
+    <!-- Shape Area column -->
+    <ng-container cdkColumnDef="area">
+      <th cdk-header-cell *cdkHeaderCellDef> Area </th>
+      <td cdk-cell *cdkCellDef="let element"> {{element.area}} </td>
+    </ng-container>
+    <!-- Shape Perimeter column -->
+    <ng-container cdkColumnDef="perimeter">
+      <th cdk-header-cell *cdkHeaderCellDef> Perimeter </th>
+      <td cdk-cell *cdkCellDef="let element"> {{element.perimeter}} </td>
+    </ng-container>
+    <!-- Shape Coordinates column -->
+    <ng-container cdkColumnDef="coordinates">
+      <th cdk-header-cell *cdkHeaderCellDef> Coordinates </th>
+      <td cdk-cell *cdkCellDef="let element"> {{element.coordinates.length}} </td>
+    </ng-container>
+    <!-- Shape Pins column -->
+    <ng-container cdkColumnDef="pins">
+      <th cdk-header-cell *cdkHeaderCellDef> Pins </th>
+      <td cdk-cell *cdkCellDef="let element"> {{element.isVisiblePin}} </td>
+    </ng-container>
+    <!-- Shape Visible column -->
+    <ng-container cdkColumnDef="visible">
+      <th cdk-header-cell *cdkHeaderCellDef> Visible </th>
+      <td cdk-cell *cdkCellDef="let element"> {{element.isVisible}} </td>
+    </ng-container>
+    <!-- Shape Edit column -->
+    <ng-container cdkColumnDef="editable">
+      <th cdk-header-cell *cdkHeaderCellDef> Edit </th>
+      <td cdk-cell *cdkCellDef="let element"> {{element.isEditable}} </td>
+    </ng-container>
+
     <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>
     <tr cdk-row *cdkRowDef="let row; columns: displayedColumns;"></tr>
 </table>
