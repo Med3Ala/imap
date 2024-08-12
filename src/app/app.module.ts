@@ -8,6 +8,7 @@ import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import { ShapesTableComponent } from './shapes-table/shapes-table.component';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import {CdkTableModule} from '@angular/cdk/table';
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import {MatIconModule} from '@angular/material/icon';
     BrowserAnimationsModule,
     MatDialogModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    CdkTableModule
   ],
   providers: [],
   bootstrap: [AppComponent]
