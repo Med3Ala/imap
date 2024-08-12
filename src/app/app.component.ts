@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ShapesTableComponent } from './shapes-table/shapes-table.component';
+import { iShapeContext } from 'projects/leaflet-i-shape/src/lib';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +28,19 @@ export class AppComponent implements OnInit{
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
     });
+  }
+
+  drawCircle() {
+    iShapeContext.instance?.draw("circle");
+  }
+  drawRectangle() {
+    iShapeContext.instance?.draw("rectangle");
+  }
+  drawPolygon() {
+    iShapeContext.instance?.draw("polygon");
+  }
+  drawPath() {
+    iShapeContext.instance?.draw("path");
   }
 
 }

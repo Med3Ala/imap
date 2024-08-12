@@ -1,2 +1,37 @@
-<button mat-mini-fab (click)="openDialog()" class="menuBtn"><mat-icon>menu</mat-icon></button>
+<!-- <button mat-mini-fab (click)="openDialog()" class="menuBtn"><mat-icon>menu</mat-icon></button> -->
 <app-map></app-map>
+
+<button class="menuBtn" mat-mini-fab [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <!-- Shapes table -->
+    <button mat-menu-item (click)="openDialog()">
+      <mat-icon>interests</mat-icon>
+      <span>Shapes Table</span>
+    </button>
+
+    <!-- Draw circle -->
+    <button mat-menu-item (click)="drawCircle()">
+      <mat-icon>radio_button_unchecked</mat-icon>
+      <span>Draw Circle</span>
+    </button>
+
+    <!-- Draw rectangle -->
+    <button mat-menu-item (click)="drawRectangle()">
+      <mat-icon>crop_7_5</mat-icon>
+      <span>Draw Rectangle</span>
+    </button>
+
+    <!-- Draw polygon -->
+    <button mat-menu-item (click)="drawPolygon()">
+      <mat-icon>pentagon</mat-icon>
+      <span>Draw Polygon</span>
+    </button>
+
+    <!-- Draw polyline -->
+    <button mat-menu-item (click)="drawPath()">
+      <mat-icon>timeline</mat-icon>
+      <span>Draw Path</span>
+    </button>
+  </mat-menu>

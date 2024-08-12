@@ -9,6 +9,7 @@ import { ShapesTableComponent } from './shapes-table/shapes-table.component';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {CdkTableModule} from '@angular/cdk/table';
+import {MatMenuModule} from '@angular/material/menu';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import {CdkTableModule} from '@angular/cdk/table';
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
-    CdkTableModule
+    CdkTableModule,
+    MatMenuModule
   ],
   providers: [],
   bootstrap: [AppComponent]

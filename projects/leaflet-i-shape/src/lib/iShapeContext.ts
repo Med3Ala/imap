@@ -50,7 +50,27 @@ export class iShapeContext {
         return iShapeContext.Shapes.value;
     }
 
-
+    draw(type: string) : iShape{
+        let shape : iShape;
+        switch(type){
+            case 'polygon':
+                shape = new iPoly(iShapeContext.Shapes.value.length, 'Poly', 0, 0, []);
+                break;
+            case 'circle':
+                shape = new iCircle(iShapeContext.Shapes.value.length, 'Circle', 0, 0, [], 0);
+                break;
+            case 'rectangle':
+                shape = new iRect(iShapeContext.Shapes.value.length, 'Rect', 100, 40, []);
+                break;
+            case 'path':
+                shape = new iPath(iShapeContext.Shapes.value.length, 'Path', 0, 0, []);
+                break;
+            default:
+                shape = new iPoly(iShapeContext.Shapes.value.length, 'Poly', 0, 0, []);
+        }
+        shape.draw();
+        return shape;
+    }
 }
 
 
@@ -140,227 +160,227 @@ export class iShape {
       });
       iShapeContext.Shapes.next(iShapeContext.Shapes.value.filter((s) => s.id != this.id));
     }
+}
+  
+export class iPath extends iShape {
+  constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
+    super(id, name, area, perimeter, coordinates);
   }
-  
-  export class iPath extends iShape {
-    constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
-      super(id, name, area, perimeter, coordinates);
-    }
-  
-    override draw(){
-      console.log('Drawing Path');
-      let finished = false;
-  
-      from(iShapeContext.clickObs).pipe(take(1)).subscribe(e=>{
-        this.addPin(e.latlng);
-        this.pins[0].bindPopup("click me to finish drawing", {closeOnClick:false}).openPopup()
-        this.pins[0].on('click', ()=>{
-          finished = true;
-          this.shape = L.polyline(this.coordinates, {
-            color: 'blue',
-            fillColor: '#30f',
-            fillOpacity: 0.5
-          });
-          this.shape.on("dblclick", ()=>{this.delete()})
-          iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
-          this.refreshData();
-          this.enableDragging();
-        })
+
+  override draw(){
+    console.log('Drawing Path');
+    let finished = false;
+
+    from(iShapeContext.clickObs).pipe(take(1)).subscribe(e=>{
+      this.addPin(e.latlng);
+      this.pins[0].bindPopup("click me to finish drawing", {closeOnClick:false}).openPopup()
+      this.pins[0].on('click', ()=>{
+        finished = true;
+        this.shape = L.polyline(this.coordinates, {
+          color: 'blue',
+          fillColor: '#30f',
+          fillOpacity: 0.5
+        });
+        this.shape.on("dblclick", ()=>{this.toggleEdit()})
+        iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
+        this.refreshData();
+        this.enableDragging();
       })
-  
-      from(iShapeContext.clickObs).pipe(
-        skip(1),
-        takeWhile(() => !finished)
-      ).subscribe(e=>{
-        this.addPin(e.latlng);
-      });
-    }
-  
-    refreshData(){
-      this.perimeter = turf.length(turf.lineString(this.coordinates.map((c) => [c.lng, c.lat])), {units: 'kilometers'}) * 1000;
-      this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
-    }
-  
-    enableDragging(){
-      this.pins.forEach((p,index) => {
-        p.on('drag', (e) => {
-          this.coordinates[index] = p.getLatLng();
-          (this.shape as L.Polyline)?.setLatLngs(this.coordinates);
-          this.refreshData();
-        })
-      })
-    }
+    })
+
+    from(iShapeContext.clickObs).pipe(
+      skip(1),
+      takeWhile(() => !finished)
+    ).subscribe(e=>{
+      this.addPin(e.latlng);
+    });
   }
-  
-  export class iPoly extends iShape {
-    constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
-      super(id, name, area, perimeter, coordinates);
-    }
-  
-    override draw(){
-      console.log('Drawing Poly');
-      let finished = false;
-  
-      from(iShapeContext.clickObs).pipe(take(1)).subscribe(e=>{
-        this.addPin(e.latlng);
-        this.pins[0].bindPopup("click me to finish drawing", {closeOnClick:false}).openPopup()
-        this.pins[0].on('click', ()=>{
-          finished = true;
-          this.shape = L.polygon(this.coordinates, {
-            color: 'blue',
-            fillColor: '#30f',
-            fillOpacity: 0.5
-          });
-          this.shape.on("dblclick", ()=>{this.delete()})
-          iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
-          this.enableDragging();
-          this.refreshData();
-        })
-      })
-  
-      from(iShapeContext.clickObs).pipe(
-        skip(1),
-        takeWhile(() => !finished)
-      ).subscribe(e=>{
-        this.addPin(e.latlng);
-      });
-    }
-  
-    refreshData(){
-      // reclaculate area and perimeter
-      this.area = turf.area(turf.polygon([
-        [...this.coordinates.map(
-          (c) => [c.lng, c.lat]
-        ), [this.coordinates[0].lng, this.coordinates[0].lat] as any]
-      ]));
-      this.perimeter = turf.length(turf.lineString(this.coordinates.map((c) => [c.lng, c.lat])), {units: 'kilometers'}) * 1000;
-      this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
-    }
- 
-    enableDragging(){
-      this.pins.forEach((p,index) => {
-        p.on('drag', (e) => {
-          this.coordinates[index] = p.getLatLng();
-          (this.shape as L.Polygon)?.setLatLngs(this.coordinates);
-          this.refreshData();
-        })
-      })
-    }
+
+  refreshData(){
+    this.perimeter = turf.length(turf.lineString(this.coordinates.map((c) => [c.lng, c.lat])), {units: 'kilometers'}) * 1000;
+    this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
   }
-  
-  export class iRect extends iShape {
-    length: number;
-    width: number;
-  
-    constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
-      super(id, name, area, perimeter, coordinates);
-      this.length = 0;
-      this.width = 0;
-    }
-  
-    override draw(){
-      console.log('Drawing Rect');
-      from(iShapeContext.clickObs).pipe(
-        take(2)
-      ).subscribe({
-        next: (e: L.LeafletMouseEvent) => {
-          this.addPin(e.latlng);
-        },
-        complete: () => {
-          this.width = turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.coordinates[1].lng, this.coordinates[0].lat]), {units: 'kilometers'}) * 1000;
-          this.length = turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.coordinates[0].lng, this.coordinates[1].lat]), {units: 'kilometers'}) * 1000;
-          this.shape = L.polygon([
-            [this.coordinates[0].lat, this.coordinates[0].lng],
-            [this.coordinates[1].lat, this.coordinates[0].lng],
-            [this.coordinates[1].lat, this.coordinates[1].lng],
-            [this.coordinates[0].lat, this.coordinates[1].lng],
-          ], {
-            color: 'blue',
-            fillColor: '#30f',
-            fillOpacity: 0.5
-          });
-          this.shape.on("dblclick", ()=>{this.delete()})
-          iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
-          this.refreshData();
-          this.enableDragging();
-        }
-      });
-    }
-  
-    refreshData(){
-      // reclaculate area and perimeter
-      this.area = this.length * this.width;
-      this.perimeter = 2 * (this.length + this.width);
-      this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
-    }
-  
-    enableDragging(){
-      var dragDot = (e: any, index : number) => {
-        this.coordinates[index] = this.pins[index].getLatLng();
-        (this.shape as L.Polygon)?.setLatLngs([
+
+  enableDragging(){
+    this.pins.forEach((p,index) => {
+      p.on('drag', (e) => {
+        this.coordinates[index] = p.getLatLng();
+        (this.shape as L.Polyline)?.setLatLngs(this.coordinates);
+        this.refreshData();
+      })
+    })
+  }
+}
+
+export class iPoly extends iShape {
+  constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
+    super(id, name, area, perimeter, coordinates);
+  }
+
+  override draw(){
+    console.log('Drawing Poly');
+    let finished = false;
+
+    from(iShapeContext.clickObs).pipe(take(1)).subscribe(e=>{
+      this.addPin(e.latlng);
+      this.pins[0].bindPopup("click me to finish drawing", {closeOnClick:false}).openPopup()
+      this.pins[0].on('click', ()=>{
+        finished = true;
+        this.shape = L.polygon(this.coordinates, {
+          color: 'blue',
+          fillColor: '#30f',
+          fillOpacity: 0.5
+        });
+        this.shape.on("dblclick", ()=>{this.toggleEdit()})
+        iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
+        this.enableDragging();
+        this.refreshData();
+      })
+    })
+
+    from(iShapeContext.clickObs).pipe(
+      skip(1),
+      takeWhile(() => !finished)
+    ).subscribe(e=>{
+      this.addPin(e.latlng);
+    });
+  }
+
+  refreshData(){
+    // reclaculate area and perimeter
+    this.area = turf.area(turf.polygon([
+      [...this.coordinates.map(
+        (c) => [c.lng, c.lat]
+      ), [this.coordinates[0].lng, this.coordinates[0].lat] as any]
+    ]));
+    this.perimeter = turf.length(turf.lineString(this.coordinates.map((c) => [c.lng, c.lat])), {units: 'kilometers'}) * 1000;
+    this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
+  }
+
+  enableDragging(){
+    this.pins.forEach((p,index) => {
+      p.on('drag', (e) => {
+        this.coordinates[index] = p.getLatLng();
+        (this.shape as L.Polygon)?.setLatLngs(this.coordinates);
+        this.refreshData();
+      })
+    })
+  }
+}
+
+export class iRect extends iShape {
+  length: number;
+  width: number;
+
+  constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
+    super(id, name, area, perimeter, coordinates);
+    this.length = 0;
+    this.width = 0;
+  }
+
+  override draw(){
+    console.log('Drawing Rect');
+    from(iShapeContext.clickObs).pipe(
+      take(2)
+    ).subscribe({
+      next: (e: L.LeafletMouseEvent) => {
+        this.addPin(e.latlng);
+      },
+      complete: () => {
+        this.width = turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.coordinates[1].lng, this.coordinates[0].lat]), {units: 'kilometers'}) * 1000;
+        this.length = turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.coordinates[0].lng, this.coordinates[1].lat]), {units: 'kilometers'}) * 1000;
+        this.shape = L.polygon([
           [this.coordinates[0].lat, this.coordinates[0].lng],
           [this.coordinates[1].lat, this.coordinates[0].lng],
           [this.coordinates[1].lat, this.coordinates[1].lng],
           [this.coordinates[0].lat, this.coordinates[1].lng],
-        ]);
+        ], {
+          color: 'blue',
+          fillColor: '#30f',
+          fillOpacity: 0.5
+        });
+        this.shape.on("dblclick", ()=>{this.toggleEdit()})
+        iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
         this.refreshData();
+        this.enableDragging();
       }
-      this.pins[0].on('drag', (e) => {dragDot(e, 0)});
-      this.pins[1].on('drag', (e) => {dragDot(e, 1)});
-    }
+    });
   }
-  
-  export class iCircle extends iShape {
-    radius: number;
-  
-    constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[], radius: number) {
-      super(id, name, area, perimeter, coordinates);
-      this.radius = radius;
+
+  refreshData(){
+    // reclaculate area and perimeter
+    this.area = this.length * this.width;
+    this.perimeter = 2 * (this.length + this.width);
+    this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
+  }
+
+  enableDragging(){
+    var dragDot = (e: any, index : number) => {
+      this.coordinates[index] = this.pins[index].getLatLng();
+      (this.shape as L.Polygon)?.setLatLngs([
+        [this.coordinates[0].lat, this.coordinates[0].lng],
+        [this.coordinates[1].lat, this.coordinates[0].lng],
+        [this.coordinates[1].lat, this.coordinates[1].lng],
+        [this.coordinates[0].lat, this.coordinates[1].lng],
+      ]);
+      this.refreshData();
     }
-  
-    override draw(){
-      console.log('Drawing circle');
-      
-      from(iShapeContext.clickObs).pipe(
-        take(2)
-      ).subscribe({
-        next: (e: L.LeafletMouseEvent) => {
-          this.addPin(e.latlng);
-        },
-        complete: () => {
-          this.radius = turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.coordinates[1].lng, this.coordinates[1].lat]), {units: 'kilometers'}) * 1000;
-          this.shape = L.circle(this.coordinates[0], {
-            color: 'blue',
-            fillColor: '#30f',
-            fillOpacity: 0.5,
-            radius : this.radius
-          })
-          this.shape.on("dblclick", ()=>{this.delete()})
-          iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
-          this.refreshData();
-          this.enableDragging();
-        }
-      });
-    }
-  
-    refreshData(){
-      // reclaculate area and perimeter
-      this.area = Math.PI * Math.pow(this.radius, 2);
-      this.perimeter = 2 * Math.PI * this.radius;
-      this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
-    }
-  
-    enableDragging(){
-      this.pins[0].on('drag', (e) => {
-        (this.shape as L.CircleMarker ).setLatLng(this.pins[0].getLatLng());
-      });
-      this.pins[1].on('drag', (e) => {
-        this.radius = turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.pins[1].getLatLng().lng, this.pins[1].getLatLng().lat]), {units: 'kilometers'}) * 1000;
-        (this.shape as L.CircleMarker ).setRadius(this.radius);
+    this.pins[0].on('drag', (e) => {dragDot(e, 0)});
+    this.pins[1].on('drag', (e) => {dragDot(e, 1)});
+  }
+}
+
+export class iCircle extends iShape {
+  radius: number;
+
+  constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[], radius: number) {
+    super(id, name, area, perimeter, coordinates);
+    this.radius = radius;
+  }
+
+  override draw(){
+    console.log('Drawing circle');
+    
+    from(iShapeContext.clickObs).pipe(
+      take(2)
+    ).subscribe({
+      next: (e: L.LeafletMouseEvent) => {
+        this.addPin(e.latlng);
+      },
+      complete: () => {
+        this.radius = turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.coordinates[1].lng, this.coordinates[1].lat]), {units: 'kilometers'}) * 1000;
+        this.shape = L.circle(this.coordinates[0], {
+          color: 'blue',
+          fillColor: '#30f',
+          fillOpacity: 0.5,
+          radius : this.radius
+        })
+        this.shape.on("dblclick", ()=>{this.toggleEdit()})
+        iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
         this.refreshData();
-      });
-    }
+        this.enableDragging();
+      }
+    });
   }
+
+  refreshData(){
+    // reclaculate area and perimeter
+    this.area = Math.PI * Math.pow(this.radius, 2);
+    this.perimeter = 2 * Math.PI * this.radius;
+    this.shape.bindPopup(`Name : ${this.name} --- ID : ${this.id}<br>Area :${this.area}<br>Perimeter : ${this.perimeter}`)
+  }
+
+  enableDragging(){
+    this.pins[0].on('drag', (e) => {
+      (this.shape as L.CircleMarker ).setLatLng(this.pins[0].getLatLng());
+    });
+    this.pins[1].on('drag', (e) => {
+      this.radius = turf.distance(turf.point([this.coordinates[0].lng, this.coordinates[0].lat]), turf.point([this.pins[1].getLatLng().lng, this.pins[1].getLatLng().lat]), {units: 'kilometers'}) * 1000;
+      (this.shape as L.CircleMarker ).setRadius(this.radius);
+      this.refreshData();
+    });
+  }
+}
   
 
   
