@@ -1,5 +1,5 @@
 <div class="container">
-    hello world
+    hShapes List
 <table cdk-table [dataSource]="shapes">
     <!-- Shape Id column -->
     <ng-container cdkColumnDef="id">
@@ -19,12 +19,12 @@
     <!-- Shape Area column -->
     <ng-container cdkColumnDef="area">
       <th cdk-header-cell *cdkHeaderCellDef> Area </th>
-      <td cdk-cell *cdkCellDef="let element"> {{element.area}} </td>
+      <td cdk-cell *cdkCellDef="let element"> {{(element.area!=0?element.area / 1000:0 ) | number: '0.0-0'}} km² </td>
     </ng-container>
     <!-- Shape Perimeter column -->
     <ng-container cdkColumnDef="perimeter">
       <th cdk-header-cell *cdkHeaderCellDef> Perimeter </th>
-      <td cdk-cell *cdkCellDef="let element"> {{element.perimeter}} </td>
+      <td cdk-cell *cdkCellDef="let element"> {{(element.perimeter!=0?element.perimeter / 1000:0) | number: '0.0-0'}} km </td>
     </ng-container>
     <!-- Shape Coordinates column -->
     <ng-container cdkColumnDef="coordinates">
@@ -34,17 +34,17 @@
     <!-- Shape Pins column -->
     <ng-container cdkColumnDef="pins">
       <th cdk-header-cell *cdkHeaderCellDef> Pins </th>
-      <td cdk-cell *cdkCellDef="let element"> {{element.isVisiblePin}} </td>
+      <td cdk-cell *cdkCellDef="let element" (click)="element.togglePin()"> {{element.isVisiblePin}} </td>
     </ng-container>
     <!-- Shape Visible column -->
     <ng-container cdkColumnDef="visible">
       <th cdk-header-cell *cdkHeaderCellDef> Visible </th>
-      <td cdk-cell *cdkCellDef="let element"> {{element.isVisible}} </td>
+      <td cdk-cell *cdkCellDef="let element" (click)="element.toggleVisibility()"> {{element.isVisible}} </td>
     </ng-container>
     <!-- Shape Edit column -->
     <ng-container cdkColumnDef="editable">
       <th cdk-header-cell *cdkHeaderCellDef> Edit </th>
-      <td cdk-cell *cdkCellDef="let element"> {{element.isEditable}} </td>
+      <td cdk-cell *cdkCellDef="let element" (click)="element.toggleEdit()"> {{element.isEditable}} </td>
     </ng-container>
 
     <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>

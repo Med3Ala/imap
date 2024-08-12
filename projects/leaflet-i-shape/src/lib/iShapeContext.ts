@@ -24,7 +24,7 @@ export class iShapeContext {
 
         iShapeContext.Shapes.subscribe((shapes) => {
             shapes.forEach((s:iShape)=>{
-              s.shape.addTo(this.map);
+              s.isVisible ? s.shape.addTo(this.map) : s.shape.remove();
             })
         });
 
@@ -188,7 +188,8 @@ export class iPath extends iShape {
           fillColor: '#30f',
           fillOpacity: 0.5
         });
-        this.shape.on("dblclick", ()=>{this.toggleEdit()})
+        this.shape.on("click", ()=>{console.log('clicked')})
+        this.shape.on("dblclick", ()=>{this.toggleEdit(); console.log('dblclicked')})
         iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
         this.refreshData();
         this.enableDragging();
@@ -241,7 +242,8 @@ export class iPoly extends iShape {
           fillColor: '#30f',
           fillOpacity: 0.5
         });
-        this.shape.on("dblclick", ()=>{this.toggleEdit()})
+        this.shape.on("click", ()=>{console.log('clicked')})
+        this.shape.on("dblclick", ()=>{this.toggleEdit(); console.log('dblclicked')})
         iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
         this.enableDragging();
         this.refreshData();
@@ -311,7 +313,8 @@ export class iRect extends iShape {
           fillColor: '#30f',
           fillOpacity: 0.5
         });
-        this.shape.on("dblclick", ()=>{this.toggleEdit()})
+        this.shape.on("click", ()=>{console.log('clicked')})
+        this.shape.on("dblclick", ()=>{this.toggleEdit(); console.log('dblclicked')})
         iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
         this.refreshData();
         this.enableDragging();
@@ -370,7 +373,8 @@ export class iCircle extends iShape {
           fillOpacity: 0.5,
           radius : this.radius
         })
-        this.shape.on("dblclick", ()=>{this.toggleEdit()})
+        this.shape.on("click", ()=>{console.log('clicked')})
+        this.shape.on("dblclick", ()=>{this.toggleEdit(); console.log('dblclicked')})
         iShapeContext.Shapes.next([...iShapeContext.Shapes.value, this]);
         this.refreshData();
         this.enableDragging();
