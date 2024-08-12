@@ -2,6 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ShapesTableComponent } from './shapes-table/shapes-table.component';
 import { iShapeContext } from 'projects/leaflet-i-shape/src/lib';
+import { FilterModalComponent } from './filter-modal/filter-modal.component';
 
 @Component({
   selector: 'app-root',
@@ -29,6 +30,14 @@ export class AppComponent implements OnInit{
       console.log(`Dialog result: ${result}`);
     });
   }
+  
+  openFilter() {
+    const dialogRef = this.dialog.open(FilterModalComponent);
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
+  }
 
   drawCircle() {
     iShapeContext.instance?.draw("circle");
@@ -45,5 +54,6 @@ export class AppComponent implements OnInit{
   drawMarker() {
     iShapeContext.instance?.draw("marker");
   }
+
 
 }

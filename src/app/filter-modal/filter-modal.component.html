@@ -1,0 +1,33 @@
+<section class="filter-section">
+
+    <!-- filter Shapes -->
+    <span class="filter-list-section">
+        <ul>
+            <li>
+                <mat-checkbox class="filter-margin" [checked]="filters.circles" (change)="update($event.checked, 'circles')">
+                    circles
+                </mat-checkbox>
+            </li>
+            <li>
+                <mat-checkbox class="filter-margin" [checked]="filters.rectangles" (change)="update($event.checked, 'rectangles')">
+                    rectangles
+                </mat-checkbox>
+            </li>
+            <li>
+                <mat-checkbox class="filter-margin" [checked]="filters.polygons" (change)="update($event.checked, 'polygons')">
+                    polygons
+                </mat-checkbox>
+            </li>
+            <li>
+                <mat-checkbox class="filter-margin" [checked]="filters.paths" (change)="update($event.checked, 'paths')">
+                    paths
+                </mat-checkbox>
+            </li>
+            <li>
+                <mat-checkbox class="filter-margin" [checked]="filters.markers" (change)="update($event.checked, 'markers')">
+                    markers
+                </mat-checkbox>
+            </li>
+        </ul>
+    </span>
+  </section>

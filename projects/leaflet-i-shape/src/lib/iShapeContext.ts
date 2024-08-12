@@ -88,6 +88,7 @@ export class iShape {
     isVisible: boolean = true;
     isVisiblePin: boolean = true;
     isEditable: boolean = false;
+    categorie = "shapes";
   
     constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
       this.id = id;
@@ -166,6 +167,9 @@ export class iShape {
 }
   
 export class iPath extends iShape {
+  
+  override categorie = "paths";
+
   constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
     super(id, name, area, perimeter, coordinates);
   }
@@ -216,6 +220,9 @@ export class iPath extends iShape {
 }
 
 export class iPoly extends iShape {
+
+  override categorie = "polygons";
+
   constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
     super(id, name, area, perimeter, coordinates);
   }
@@ -272,6 +279,8 @@ export class iPoly extends iShape {
 }
 
 export class iRect extends iShape {
+
+  override categorie = "rectangles";
   length: number;
   width: number;
 
@@ -334,6 +343,9 @@ export class iRect extends iShape {
 }
 
 export class iCircle extends iShape {
+
+  override categorie = "circles";
+
   radius: number;
 
   constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[], radius: number) {
@@ -386,6 +398,9 @@ export class iCircle extends iShape {
 }
 
 export class iMarker extends iShape {
+
+    override categorie = "markers";
+
     constructor(id: number, name: string, area: number, perimeter: number, coordinates: L.LatLng[]) {
       super(id, name, area, perimeter, coordinates);
     }

@@ -10,13 +10,16 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {CdkTableModule} from '@angular/cdk/table';
 import {MatMenuModule} from '@angular/material/menu';
+import { FilterModalComponent } from './filter-modal/filter-modal.component';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     MapComponent,
-    ShapesTableComponent
+    ShapesTableComponent,
+    FilterModalComponent
   ],
   imports: [
     BrowserModule,
@@ -25,7 +28,8 @@ import {MatMenuModule} from '@angular/material/menu';
     MatButtonModule,
     MatIconModule,
     CdkTableModule,
-    MatMenuModule
+    MatMenuModule,
+    MatCheckboxModule
   ],
   providers: [],
   bootstrap: [AppComponent]
